@@ -27,14 +27,14 @@
 use strict;
 use warnings;
 
-use Cwd qw(abs_path);	# for finding where files really are
-use Fcntl;		# for sysopen flags
+use Cwd qw(abs_path);   # for finding where files really are
+use Fcntl;              # for sysopen flags
 use File::Basename;
 use Getopt::Long qw(:config no_ignore_case bundling);
 use Getopt::Std;
 use IPC::Open2;
 use Locale::gettext;
-use POSIX;		# for setlocale()
+use POSIX;              # for setlocale()
 use Pod::Usage;
 use Text::Balanced qw(extract_bracketed extract_multiple);
 
@@ -51,21 +51,21 @@ die _("No .spec file to work with!  Exiting.\n") unless @ARGV;
 # Initialized globals
 my $NoAutoReq = 0;
 my %cmdopts = (type => '',
-		stage => 'a',
-		short => undef);
+                stage => 'a',
+                short => undef);
 my %defattr = (filemode => '-',
-		owner => '-',
-		group => '-',
-		dirmode => '-');
+                owner => '-',
+                group => '-',
+                dirmode => '-');
 
 my %static_config = load_static_config();
 
 # Scriptlets
 my %script = (prep => '',
-		build => '',
-		install => '',
-		check => '',
-		clean => qq([ "\$RPM_BUILD_ROOT" != "/" ] && %{__rm} -rf \$RPM_BUILD_ROOT\n) );
+                build => '',
+                install => '',
+                check => '',
+                clean => qq([ "\$RPM_BUILD_ROOT" != "/" ] && %{__rm} -rf \$RPM_BUILD_ROOT\n) );
 my $check_status = "\nSTATUS=\$?\nif [ \$STATUS -ne 0 ]; then\n  exit \$STATUS\nfi\n";
 
 my $finalmessages = ''; # A place to stuff messages that I want printed at the *very* end of any processing.
@@ -81,11 +81,11 @@ my %optflags = (all => '');
 # Package data
 # This is the form of $pkgdata{pkgname}{meta}
 # meta includes Summary, Name, Version, Release, Group, Copyright,
-#	Source, URL, Packager, BuildRoot, Description, BuildRequires,
-#	Requires, Provides
+#       Source, URL, Packager, BuildRoot, Description, BuildRequires,
+#       Requires, Provides
 # 10/31/2005 Maybe this should be flatter?  -kgd
 my %pkgdata = (main => {source => ''});
-my @pkglist = ('main');	#sigh
+my @pkglist = ('main'); #sigh
 # Files listing.  Embedding this in %pkgdata would be, um, messy.
 my %doclist;
 my @buildrequires;
@@ -93,12 +93,12 @@ my @buildconflicts;
 
 # "Constants"
 my %targets = (p => 'Prep',
-		c => 'Compile',
-		i => 'Install',
-		l => 'Verify %files',
-		a => 'Build binary and source',
-		b => 'Build binary',
-		s => 'Build source');
+                c => 'Compile',
+                i => 'Install',
+                l => 'Verify %files',
+                a => 'Build binary and source',
+                b => 'Build binary',
+                s => 'Build source');
 
 # Global file handle for multiline macro definitions
 my $fh;
@@ -590,13 +590,13 @@ sub parse_spec {
 # Basic algorithm:
 # For each line
 #   if it's a member of an %if construct, branch and see which segment of the
-#	spec file we need to parse and which one gets discarded, then
-#	short-circuit back to the top of the loop.
+#       spec file we need to parse and which one gets discarded, then
+#       short-circuit back to the top of the loop.
 #   if it's a %section, bump the stage.  Preparse addons to the %section line
-#	(eg subpackage) and stuff them in suitable loop-global variables, then
-#	short-circuit back to the top of the loop.
+#       (eg subpackage) and stuff them in suitable loop-global variables, then
+#       short-circuit back to the top of the loop.
 #   Otherwise, parse the line according to which section we're supposedly
-#	parsing right now
+#       parsing right now
 
   our @rbuf = ();
   sub spec_readline {
@@ -1542,7 +1542,7 @@ sub binpackage {
             }
           }
 
-          my ($fpath,$fname) = $pkgfile =~ m|(.+?/?)?([^/]+/?)$|;	# We don't need $fname now, but we might.
+          my ($fpath,$fname) = $pkgfile =~ m|(.+?/?)?([^/]+/?)$|;       # We don't need $fname now, but we might.
           if ( -d "$specglobals{buildroot}$pkgfile" ) {
             vdebug($pkgfile, 5, "binpackage/add/dir/$pkg");
             qx ( $specglobals{__mkdir_p} $specglobals{buildroot}/$pkg$pkgfile );
@@ -1595,8 +1595,8 @@ sub binpackage {
     mkdir "$specglobals{buildroot}/$pkg/DEBIAN";
 
     # Munge things so that Debian tools don't choke on errant blank lines
-    $pkgdata{$pkg}{description} =~ s/\s+$//g;	# Trim trailing blanks
-    $pkgdata{$pkg}{description} =~ s/^\s+$/ ./mg;	# Replace lines consisting of " \n" with " .\n"
+    $pkgdata{$pkg}{description} =~ s/\s+$//g;   # Trim trailing blanks
+    $pkgdata{$pkg}{description} =~ s/^\s+$/ ./mg;       # Replace lines consisting of " \n" with " .\n"
 
     # Give an estimate of the installation size
     my ($installedsize) =
@@ -1642,8 +1642,8 @@ sub binpackage {
         $conffile = expandmacros($conffile);
         foreach (glob "$specglobals{buildroot}/$pkg/$conffile") {
           (my $buildroot = $specglobals{buildroot}) =~ s/([+])/\\$1/g;
-          s|$buildroot/$pkg/||g;	# nrgl.  gotta be a better way to do this...
-          s/\s+/\n/g;	# Not gonna support spaces in filenames.  Ewww.
+          s|$buildroot/$pkg/||g;        # nrgl.  gotta be a better way to do this...
+          s/\s+/\n/g;   # Not gonna support spaces in filenames.  Ewww.
           print CONFLIST "$_\n";
         }
       }
@@ -1848,19 +1848,19 @@ sub checkbuildreq {
 
       my ($reqstat,undef,undef,$reqver) = split ' ', $pkgdep;
       if ($reqstat =~ /^unknown/) {
-	# this seems to be a virtual package.
-	warn _(' * Warning:  ').$pkg.
+        # this seems to be a virtual package.
+        warn _(' * Warning:  ').$pkg.
           _(" is probably installed but seems to be a virtual package.\n");
       } elsif ($reqstat =~ /^install/) {
-	my ($resp) = qx ( $specglobals{__dpkg} --compare-versions $reqver '$rel' $ver && $specglobals{__echo} "ok" );
-	if ($resp !~ /^ok/) {
-	  warn _(' * Required build-dependency ').$pkg.
+        my ($resp) = qx ( $specglobals{__dpkg} --compare-versions $reqver '$rel' $ver && $specglobals{__echo} "ok" );
+        if ($resp !~ /^ok/) {
+          warn _(' * Required build-dependency ').$pkg.
             _(' is installed, but wrong version (').$reqver.
             _('):  Need ').$ver."\n";
         }
       } else {
-	# whatever state it's in, it's not completely installed, therefore it's missing.
-	warn _(' * Missing build-dependency ')."$pkg!\n  $pkgdep";
+        # whatever state it's in, it's not completely installed, therefore it's missing.
+        warn _(' * Missing build-dependency ')."$pkg!\n  $pkgdep";
         push @missinglist, $pkg;
       } # end not installed/installed check
     }
@@ -1918,8 +1918,8 @@ sub getreqs {
   foreach (@reqlist) {
     next if /not a dynamic executable/;
     next if /statically linked/;
-    next if m|/lib(?:64)?/ld-linux|;	# Hack! Hack!  PTHBTT!  (libc suxx0rz)
-    next if /linux-(gate|vdso).so/;	# Kernel hackery for teh W1n!!1!1eleventy-one!1  (Don't ask.  Feh.)
+    next if m|/lib(?:64)?/ld-linux|;    # Hack! Hack!  PTHBTT!  (libc suxx0rz)
+    next if /linux-(gate|vdso).so/;     # Kernel hackery for teh W1n!!1!1eleventy-one!1  (Don't ask.  Feh.)
 
     # Whee!  more hackery to detect provided-here libs.  Some apparently return from ldd as "not found".
     my ($a,$b) = split / => /;
